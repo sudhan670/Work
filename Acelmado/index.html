@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Room Scene</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Room setup
+        const roomWidth = 31.62; // sqrt(1000) in feet converted to meters
+        const roomDepth = 31.62;
+        const roomHeight = 3; // Example room height in meters
+
+        const roomGeometry = new THREE.BoxGeometry(roomWidth, roomHeight, roomDepth);
+        const roomMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+        const room = new THREE.Mesh(roomGeometry, roomMaterial);
+        room.position.y = roomHeight / 2;
+        scene.add(room);
+
+        // Function to generate random position within the room
+        function getRandomPosition(width, height, depth) {
+            return {
+                x: (Math.random() - 0.5) * width,
+                y: (Math.random() - 0.5) * height + roomHeight / 2,
+                z: (Math.random() - 0.5) * depth
+            };
+        }
+
+        // Create and place random objects
+        const objects = [];
+        for (let i = 0; i < 10; i++) { // Adjust number of objects as needed
+            const geometry = new THREE.BoxGeometry(1, 1, 1); // Example object size
+            const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+            const object = new THREE.Mesh(geometry, material);
+            const position = getRandomPosition(roomWidth, roomHeight, roomDepth);
+            object.position.set(position.x, position.y, position.z);
+            scene.add(object);
+            objects.push(object);
+        }
+
+        // Camera position
+        camera.position.z = roomDepth / 2 + 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>
